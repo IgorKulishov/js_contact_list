@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    
+    <style>
+    #table {
+      width:80%;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    }
+    #form {
+      width:80%;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    }
+    .checked {
+      margin-left: 20px;
+      font-size: 18px;      
+      color:#979aaa;
+      text-shadow: 0 1px 1px #111111;     
+    }
+    .error {
+      margin-left: 20px;
+      font-size: 18px;      
+      color:#ff4c4c;
+      text-shadow: 0 1px 1px #111111;     
+    }
+
+    </style>
+    
+    <script>
+    
+    window.onload = init;
+    function init () {
+       createTable();
+    }
+    //Initial array of contacts
+    var contacts = [
+      {
+        firstname: 'Wayne',
+        lastname:'Williams',
+        phone: "123-456-7890",
+        email:'wayne.willia@example.com'
+      },
+      {
+        firstname: 'Mike',
+        lastname:'Smith',
+        phone: "123-456-7891",
+        email: 'mike.smith@example.com'
+      },{
+        firstname: 'Nicole',
+        lastname:'Davis',
+        phone: "111-111-1111",
+        email: 'nicole.davis@example.com'
+      },{
+        firstname: 'Orest',
+        lastname:'Anderson',
+        phone: "333-444-5557",
+        email: 'orest.anderson@example.com'
+      }];
+     
+    //Add new contact
+      function addContact(){
+        
+        var errorMessageNode = document.getElementById("errorMessage");
+        
+        var emailReg = /\S+@\S+\.\S+/;
+
+        var newContactFirstName = document.getElementById('firstname').value;
+        var newContactLastName = document.getElementById('lastname').value;
+        var newContactPhone = document.getElementById('phone').value;
+        var newContactEmail = document.getElementById('email').value;
+        
+        while(errorMessageNode.childNodes.length>0){errorMessageNode.removeChild(errorMessageNode.lastChild);}
+        console.log(errorMessageNode.childNodes);
+        
+       if (emailReg.test(newContactEmail)) {
+
+          contacts.push({
+            firstname: newContactFirstName, 
+            lastname:  newContactLastName,
+            phone:     newContactPhone,
+            email:     newContactEmail
+          });
+          
+          createTable();
+          
+          document.getElementById("phone").value="";
+          document.getElementById("firstname").value=""; 
+          document.getElementById("email").value="";
+          document.getElementById("lastname").value=""; 
+
+          
+        } else {
+          var errorMessage = document.createTextNode("Please provide full information.");
+          errorMessageNode.appendChild(errorMessage);
+        }        
+        
+      }
+      //Create table
+      function createTable(){
+        
+        var contactsList = document.getElementById("contactsList");
+        while(contactsList.childNodes.length>0){contactsList.removeChild(contactsList.lastChild);}
+
+        for(var i = 0; i < contacts.length; i++) {
+        
+          var contactFirstNameNode = document.createTextNode(contacts[i].firstname);
+          var contactLastNameNode = document.createTextNode(contacts[i].lastname);
+          var contactPhoneNode = document.createTextNode(contacts[i].phone);
+          var contactEmailNode = document.createTextNode(contacts[i].email);
+          
+          var trNode = document.createElement("tr");
+          var tdNodeFirstName = document.createElement("td");
+          var tdNodeLastName = document.createElement("td");
+          var tdNodePhone = document.createElement("td");
+          var tdNodeEmail = document.createElement("td");
+          var tdNodeSelect = document.createElement("td");
+          
+          var inputNode = document.createElement("input");
+          inputNode.setAttribute("type", "checkbox");
+          inputNode.className += "checkbox";
+          
+          tdNodeFirstName.appendChild(contactFirstNameNode);
+          tdNodeLastName.appendChild(contactLastNameNode);
+          tdNodePhone.appendChild(contactPhoneNode);
+          tdNodeEmail.appendChild(contactEmailNode);
+          tdNodeSelect.appendChild(inputNode);
+          
+          trNode.appendChild(tdNodeFirstName);
+          trNode.appendChild(tdNodeLastName);
+          trNode.appendChild(tdNodePhone);
+          trNode.appendChild(tdNodeEmail);
+          trNode.appendChild(tdNodeSelect);
+          //trNode.setAttribute("onclick", "this.parentNode.removeChild(this);");
+
+          document.getElementById("contactsList").appendChild(trNode);
+        }
+        
+      }
+      
+      function sortBy(param) {
+        contacts.sort(function(a,b){
+          if (a[param] > b[param]) {
+            return 1;
+          }
+          if (a[param] < b[param]) {
+            return -1;
+          }
+          return 0;
+        });
+        createTable();
+      }
+      
+      function deleteSelected() {
+        var contactsList = document.getElementsByClassName("checkbox");
+        function arg(a, n) {
+          return (a - n + 1);
+        }
+        var n = 0;
+        for (var i = 0; i < contactsList.length; i++){
+          if (contactsList[i].checked) {
+            ++n;
+        
+            var index = arg(i, n);
+            contacts.splice(index, 1);
+          }
+        }
+        createTable();
+      }
+      
+      function firstNameValidation(e, f) {
+        var nameStr = e.value.replace(/[^A-Za-z]+/g,'');
+        var nameArr = nameStr.split('');
+        var firstLetter = nameArr.splice(0,1).toString().toUpperCase();
+        var otherLetters = nameArr.toString().replace(/,/g, '').toLowerCase();
+        var showName = firstLetter + otherLetters;
+        
+        if (showName.length > 1) {
+          document.getElementById('firstNameValidationText').innerHTML='Thank you';
+          document.getElementById("firstNameValidationText").className = "checked";
+        }
+        if (showName.length < 2) {
+          document.getElementById('firstNameValidationText').innerHTML='Please add first name';
+          document.getElementById("firstNameValidationText").className = "error";
+        }
+        document.getElementById('firstname').value = showName;
+      }
+      
+      function lastNameValidation(e, f) {
+        var nameStr = e.value.replace(/[^A-Za-z]+/g,'');
+        var nameArr = nameStr.split('');
+        var firstLetter = nameArr.splice(0,1).toString().toUpperCase();
+        var otherLetters = nameArr.toString().replace(/,/g, '').toLowerCase();
+        var showName = firstLetter + otherLetters;
+        
+        if (showName.length > 1) {
+          document.getElementById('lastNameValidationText').innerHTML='Thank you';
+          document.getElementById("lastNameValidationText").className = "checked";
+        }
+        if (showName.length < 2) {
+          document.getElementById('lastNameValidationText').innerHTML='Please add last name';
+          document.getElementById("lastNameValidationText").className = "error";
+        }
+        document.getElementById('lastname').value = showName;
+      }
+      
+      function phoneValidation(e, f){
+        var q =  f.which || f.keyCode;
+  
+        if ( q == 37 || q == 36 || q == 39 ) {
+          return true;
+        } else {
+          
+          var phoneDigitsArr = e.value.replace(/\D/g,'').split('');
+          
+          if (phoneDigitsArr.length > 3) {
+            phoneDigitsArr.splice(3,0,'-');
+          } 
+          if (phoneDigitsArr.length > 7) {
+            phoneDigitsArr.splice(7,0,'-');
+          }
+          if (phoneDigitsArr.length > 10) {
+            phoneDigitsArr.splice(12,1);
+          }
+          
+          var phoneStr = phoneDigitsArr.toString().replace(/,/g,'');
+          console.log(phoneStr);
+          document.getElementById('phone').value = phoneStr;
+          
+          if (phoneStr.length > 9) {
+            document.getElementById('phoneValidationText').innerHTML='Thank you';
+            document.getElementById("phoneValidationText").className = "checked";
+          }
+          if (phoneStr.length < 10) {
+            document.getElementById('phoneValidationText').innerHTML='10 digits of phone number';
+            document.getElementById("phoneValidationText").className = "error";
+          }
+  
+        }
+      }
+       
+    </script>
+  </head>
+
+  <body>
+    <h1>Address book</h1>
+    <table id="table">
+      <thead>
+        <tr>
+          <td><a href="#" onclick="sortBy('firstname')">First name</a></td>
+          <td><a href="#" onclick="sortBy('lastname')">Last name</a></td>
+          <td><a href="#" onclick="sortBy('phone')">Phone</a></td>
+          <td><a href="#" onclick="sortBy('email')">Email</a></td>
+          <td><a href="#" onclick="deleteSelected()">Delete</a></td>
+        </tr>
+      </thead>
+      <tbody id="contactsList">
+      </tbody>
+    </table>
+    <br>
+    <div><em>Please click titles to sort by columns</em></div>
+    <br>
+        
+    <h2>Add new contact:</h2>
+
+    <form name="form" id="form">
+      <div>
+        <label for="firstname">First name:</label>
+        <div><input type="text" name="firstname" placeholder="first name" id="firstname" onkeyup="firstNameValidation(this, event)"><span id="firstNameValidationText"></span></div>
+      </div>
+      <div>
+        <label for="lastname">Last name:</label>
+        <div><input type="text" name="lastname" placeholder="last name" id="lastname" onkeyup="lastNameValidation(this, event)"><span id="lastNameValidationText"></span></div>
+      </div>
+      <div>
+        <label for="phone">phone: </label>
+        <div><input type="tel" name="phone" max="10" placeholder="phone" id="phone" onkeyup="phoneValidation(this, event)"><span id="phoneValidationText"></span></div>
+      </div>
+      <div>
+        <label for="email">email: </label>
+        <div><input type="email" name="email" placeholder="email" id="email"></div>
+      </div>
+      <br>
+      <input type="button" value="Add" onclick="addContact()">
+    </form>
+    
+    <p id="errorMessage"></p>
+    
+  </body>
+
+</html>
